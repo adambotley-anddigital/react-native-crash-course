@@ -1,29 +1,21 @@
 import { useRouter } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
+
+import useNoteStore from '../../stores/noteStore'
 
 import AddNoteModal from '@/components/AddNoteModal'
 import NoteList from '@/components/NoteList'
-import { useAuth } from '@/contexts/AuthContext'
 import { isErrorResponse } from '@/services/databaseService'
 import noteService from '@/services/noteService'
-import { Nullable } from '@/types'
-
-export interface Note {
-  $id: string
-  text: string
-  createdAt: string
-}
+import useAuthStore from '@/stores/authStore'
+import { Note } from '@/types'
 
 const NoteScreen = () => {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
-  const [notes, setNotes] = useState<Note[]>([])
-
-  const [modalVisible, setModalVisible] = useState(false)
-  const [newNote, setNewNote] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Nullable<string>>(null)
+  const { user, loading: authLoading } = useAuthStore()
+  const state = useNoteStore(useShallow((state) => state))
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -38,32 +30,30 @@ const NoteScreen = () => {
   }, [user])
 
   const fetchNotes = async () => {
-    setLoading(true)
+    state.setLoading(true)
     const response = await noteService.getNotes(user?.$id)
 
-    setLoading(false)
+    state.setLoading(false)
     if (isErrorResponse(response)) {
-      setError(response.error)
+      state.setError(response.error)
       Alert.alert('Error', response.error)
     } else {
-      setNotes(response.data)
-      setError(null)
+      state.setNotes(response.data)
+      state.setError(null)
     }
   }
 
   const addNote = async () => {
-    if (!newNote.trim()) {
+    if (!state.newNote.trim()) {
       return
     }
 
-    const response = await noteService.addNote(user?.$id, newNote)
+    const response = await noteService.addNote(user?.$id, state.newNote)
 
     if (isErrorResponse(response)) {
       Alert.alert('Error', response.error)
     } else {
-      setNotes((prev) => [...prev, response.data])
-      setNewNote('')
-      setModalVisible(false)
+      state.addNote(response.data)
     }
   }
 
@@ -78,15 +68,7 @@ const NoteScreen = () => {
     if (isErrorResponse(response)) {
       Alert.alert('Error', response.error)
     } else {
-      setNotes((prev) =>
-        prev.map((_note) => {
-          if (_note.$id === note.$id) {
-            return response.data
-          }
-
-          return _note
-        }),
-      )
+      state.editNote(response.data)
     }
   }
 
@@ -105,7 +87,7 @@ const NoteScreen = () => {
           if (isErrorResponse(response)) {
             Alert.alert('Error', response.error)
           } else {
-            setNotes(notes.filter((_note) => _note.$id !== note.$id))
+            state.deleteNote(note)
           }
         },
       },
@@ -114,33 +96,29 @@ const NoteScreen = () => {
 
   return (
     <View style={styles.container}>
-      {loading ? (
+      {state.loading ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
         <>
-          {error && <Text style={styles.errorText}>{error}</Text>}
+          {state.error && <Text style={styles.errorText}>{state.error}</Text>}
 
-          {notes.length === 0 ? (
+          {state.notes.length === 0 ? (
             <Text style={styles.noNotesText}>You have no notes</Text>
           ) : (
-            <NoteList notes={notes} onDelete={deleteNote} onEdit={editNote} />
+            <NoteList notes={state.notes} onDelete={deleteNote} onEdit={editNote} />
           )}
         </>
       )}
 
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => {
-          setModalVisible(true)
-        }}>
+      <TouchableOpacity style={styles.addButton} onPress={state.showModal}>
         <Text style={styles.addButtonText}>+ Add Note</Text>
       </TouchableOpacity>
 
       <AddNoteModal
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-        newNote={newNote}
-        setNewNote={setNewNote}
+        modalVisible={state.modalVisible}
+        hideModal={state.hideModal}
+        newNote={state.newNote}
+        setNewNote={state.setNewNote}
         addNote={addNote}
       />
     </View>

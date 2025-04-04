@@ -3,7 +3,7 @@ import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'reac
 
 interface AddNoteModalProps {
   modalVisible: boolean
-  setModalVisible: (visible: boolean) => void
+  hideModal: () => void
   newNote: string
   setNewNote: (note: string) => void
   addNote: () => void
@@ -11,19 +11,13 @@ interface AddNoteModalProps {
 
 const AddNoteModal: FC<AddNoteModalProps> = ({
   modalVisible,
-  setModalVisible,
+  hideModal,
   newNote,
   setNewNote,
   addNote,
 }) => {
   return (
-    <Modal
-      visible={modalVisible}
-      animationType="slide"
-      transparent
-      onRequestClose={() => {
-        setModalVisible(false)
-      }}>
+    <Modal visible={modalVisible} animationType="slide" transparent onRequestClose={hideModal}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Add a New Note</Text>
@@ -35,11 +29,7 @@ const AddNoteModal: FC<AddNoteModalProps> = ({
           />
 
           <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                setModalVisible(false)
-              }}>
+            <TouchableOpacity style={styles.cancelButton} onPress={hideModal}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
 

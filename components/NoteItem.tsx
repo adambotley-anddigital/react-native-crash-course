@@ -1,7 +1,7 @@
 import React, { FC, useRef, useState } from 'react'
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
-import { Note } from '@/app/notes'
+import { Note } from '@/types'
 
 interface NoteItemProps {
   note: Note

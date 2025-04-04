@@ -3,8 +3,7 @@ import { ID, Query } from 'react-native-appwrite'
 import { config } from './appwrite'
 import databaseService, { isErrorResponse } from './databaseService'
 
-import { Note } from '@/app/notes'
-import { ErrorResponse } from '@/types'
+import { ErrorResponse, Note } from '@/types'
 
 const dbId = config.db
 const collectionId = config.collection.notes
