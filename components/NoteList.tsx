@@ -3,7 +3,7 @@ import { FlatList, View } from 'react-native'
 
 import NoteItem from './NoteItem'
 
-import { Note } from '@/app/notes'
+import { Note } from '@/types'
 
 interface NoteListProps {
   notes: Note[]

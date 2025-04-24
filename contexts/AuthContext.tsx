@@ -2,16 +2,20 @@ import { createContext, ReactNode, useContext, useEffect } from 'react'
 
 import authService from '@/services/authService'
 import { isErrorResponse } from '@/services/databaseService'
-import useAuthStore from '@/stores/authStore'
+import useAuthStore, { UserSession } from '@/stores/authStore'
 import { ErrorResponse } from '@/types'
 
 interface AuthContextType {
+  user: UserSession | null
+  loading: boolean
   login: (email: string, password: string) => Promise<ErrorResponse | { success: boolean }>
   register: (email: string, password: string) => Promise<ErrorResponse | { success: boolean }>
   logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
   login: (email: string, password: string) => Promise.resolve({ success: false }),
   register: (email: string, password: string) => Promise.resolve({ success: false }),
   logout: () => Promise.resolve(),
@@ -76,7 +80,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await checkUser()
   }
 
-  return <AuthContext.Provider value={{ login, register, logout }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export const useAuth = () => useContext(AuthContext)

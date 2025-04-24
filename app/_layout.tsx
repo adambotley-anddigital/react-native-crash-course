@@ -1,14 +1,16 @@
 import { Stack } from 'expo-router'
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { Text, TouchableOpacity } from 'react-native'
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+
+import '../global.css'
 
 const HeaderLogout = () => {
   const { user, logout } = useAuth()
 
   return user ? (
-    <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-      <Text style={styles.logoutText}>Logout</Text>
+    <TouchableOpacity className={styles.logoutButton} onPress={logout}>
+      <Text className={styles.logoutText}>Logout</Text>
     </TouchableOpacity>
   ) : null
 }
@@ -41,19 +43,9 @@ const RootLayout = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  logoutButton: {
-    marginRight: 15,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    backgroundColor: '#ff3b30',
-    borderRadius: 8,
-  },
-  logoutText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-})
+const styles = {
+  logoutButton: 'mr-4 py-2 px-4 bg-red-500 rounded-md',
+  logoutText: 'color-white font-bold',
+}
 
 export default RootLayout

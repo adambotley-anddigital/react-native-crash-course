@@ -3,13 +3,12 @@ import { useEffect } from 'react'
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
-import useNoteStore from '../../stores/noteStore'
-
 import AddNoteModal from '@/components/AddNoteModal'
 import NoteList from '@/components/NoteList'
 import { isErrorResponse } from '@/services/databaseService'
 import noteService from '@/services/noteService'
 import useAuthStore from '@/stores/authStore'
+import useNoteStore from '@/stores/noteStore'
 import { Note } from '@/types'
 
 const NoteScreen = () => {
@@ -25,7 +24,7 @@ const NoteScreen = () => {
 
   useEffect(() => {
     if (user) {
-      fetchNotes()
+      fetchNotes().catch(console.error)
     }
   }, [user])
 
@@ -95,7 +94,7 @@ const NoteScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="bg-pink-500">
       {state.loading ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
@@ -110,7 +109,7 @@ const NoteScreen = () => {
         </>
       )}
 
-      <TouchableOpacity style={styles.addButton} onPress={state.showModal}>
+      <TouchableOpacity style={styles.addButton} className="bg-pink-500" onPress={state.showModal}>
         <Text style={styles.addButtonText}>+ Add Note</Text>
       </TouchableOpacity>
 

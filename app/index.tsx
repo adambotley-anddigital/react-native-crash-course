@@ -33,7 +33,7 @@ const HomeScreen = () => {
         onPress={() => {
           router.push('/notes')
         }}>
-        <Text style={styles.buttonText}>Get Started</Text>
+        <Text className="bg-pink-500">Get Started</Text>
       </TouchableOpacity>
     </View>
   )
